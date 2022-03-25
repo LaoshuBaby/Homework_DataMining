@@ -12,5 +12,9 @@
 
 详情见各算法的目录
 
-* Aporill算法
-* 分冶算法
++ Aporill算法
++ 分冶算法
+
+## 其他同校同级优秀作业
+
++ [648759528ass/DataMiningCourse](https://github.com/648759528ass/DataMiningCourse)
