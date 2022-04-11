@@ -23,13 +23,17 @@ def is_in():
     pass
 
 def build_first_c_list(raw_data):
-    # 构建出初始的c——list，其实就是把所有出现了的item都记下来一次即可
-    pass
+    c_list=set([])
+    for i in range(len(raw_data)):
+        for j in range(len(raw_data[i][1])):
+            c_list.add(raw_data[i][1][j])
+    c_list=list(c_list)
+    return c_list
 
 def count_sup_for_C_list(raw_data, c_list):
     for i in range(len(raw_data)):
         for j in range(len(c_list)):
-            if is_in(raw_data[i],c_list[j].data) :
+            if is_in(raw_data[i][1],c_list[j].data) :
                 c_list[j].count+=1
     for i in range(len(c_list)):
         c_list[i].sup=c_list[i].count/len(raw_data)
