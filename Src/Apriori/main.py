@@ -1,8 +1,12 @@
 from Src.Apriori.user_class import Itemset
 
+def print_list(lst):
+    for i in range(len(lst)):
+        print(lst[i])
+    print("======","len="+str(len(lst)))
 
 
-def build_first_c_list(raw_data):
+def c_list_enum_collect(raw_data):
     c_list=set([])
     for i in range(len(raw_data)):
         for j in range(len(raw_data[i][1])):
@@ -16,7 +20,7 @@ def build_first_c_list(raw_data):
 
 
 
-def count_sup_for_C_list(raw_data, c_list):
+def c_list_sup_count(raw_data, c_list):
     for i in range(len(raw_data)):
         for j in range(len(c_list)):
             if set(c_list[j].data).issubset(set(raw_data[i][1])):
@@ -36,12 +40,12 @@ def c_list_prune(c_list, MIN_SUP):
     return new_c_list
 
 
-def build_pre_l_list(c_list):
+def l_list_pre_combine(c_list):
     # 构建出所有可能的子集的组合,目前这步有重复
-    
+
     l_list=[]
     for i in range(len(c_list)):
-        for j in range(len(c_list)):
+        for j in range(i,len(c_list)):
             if i!=j:
                 l_list.append(Itemset(
                     data=set(c_list[i].data).union(set(c_list[j].data)),
@@ -67,27 +71,17 @@ def l_list_prune(l_list,c_list):
     return true_l_list
 
 def apriori(RAW_DATA, MIN_SUP):
-    c1=build_first_c_list(RAW_DATA)
-    # for i in range(len(c1)):
-    #     print(c1[i])
-    # print("======")
-    #c1=count_sup_for_C_list(RAW_DATA,c1)
-    # for i in range(len(c1)):
-    #     print(c1[i])
-    # print("======")
-    # 除了前面的一句预热，其他的都可以循环内执行了
-    c1=c_list_prune(count_sup_for_C_list(RAW_DATA,c1),MIN_SUP)
-    for i in range(len(c1)):
-        print(c1[i])
-    # 按理说L1直接等于C1，但是我们还是走一下生成候选项集的过程，拓展组合然后prune会这个和C1一样的L1
-    print("======","len(c1)="+str(len(c1)))
-    l1=build_pre_l_list(c1)
-    for i in range(len(l1)):
-        print(l1[i])
-    print("======","len(l1)="+str(len(l1)))
+    # 预热遍历生成空的所有待计算支持度的元素列表
+    c0=c_list_enum_collect(RAW_DATA)
+    #print_list(c0)
+
+    # 循环内执行
+    c1=c_list_prune(c_list_sup_count(RAW_DATA, c0), MIN_SUP)
+    print_list(c1)
+    l1=l_list_pre_combine(c1)
+    print_list(l1)
     l1=l_list_prune(l1,c1)
-    for i in range(len(l1)):
-        print(l1[i])
+    print_list(l1)
 
 if __name__ == "__main__":
     exit(-1)
