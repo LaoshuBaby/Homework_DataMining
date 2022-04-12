@@ -1,23 +1,3 @@
-FILE_PATH="D:\\retail.dat"
-TID=0
-RAW_DATA=[]
-
-MIN_SUP=0.5
-
-## INPUT DATA
-
-def genTID():
-    global TID
-    TID+=1
-    return TID
-
-def read():
-    dat_file=open(FILE_PATH,"r")
-    dat_text=dat_file.read()
-    for i in range(len(dat_text)):
-        RAW_DATA.append([genTID(),dat_text[i].split(" ")])
-    return RAW_DATA
-
 ## COMPUTE
 
 def is_in():
@@ -63,7 +43,9 @@ def l_list_prune(l_list,c_list):
     # 输入对应的clist，对llist的每一个项集都拆开看其子集是否全都在clist里，有不合法的就毙掉这个llist中的项集
     return true_l_list
 
+def apriori():
+    pass
+
 
 if __name__ == "__main__":
-    raw_data=read()
-    print(raw_data)
+    apriori()
