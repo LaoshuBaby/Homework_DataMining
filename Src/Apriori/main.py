@@ -77,28 +77,28 @@ def l_list_prune(l_list, c_list):
 
 def apriori(RAW_DATA, MIN_SUP):
     # 预热遍历生成空的所有待计算支持度的元素列表
-    c0 = c_list_enum_collect(RAW_DATA)
+    c0_status = c_list_enum_collect(RAW_DATA)
     # print_list(c0)
 
     # 循环内执行
     def next_level(current_level, c_list):
-        c_unpruned=c_list_sup_count(RAW_DATA, c_list)
-        print_list(c_unpruned)
-        c_pruned = c_list_prune(c_unpruned, MIN_SUP)
-        print_list(c_pruned)
+        c_out=c_list_sup_count(RAW_DATA, c_list)
+        print_list(c_out)
+        l_out = c_list_prune(c_out, MIN_SUP)
+        print_list(l_out)
         if current_level != 0:
-            l_out_withoutprune = l_list_pre_combine(c_pruned)
-            print_list(l_out_withoutprune)
-            l_out = l_list_prune(l_out_withoutprune, c_pruned)
-            print_list(l_out)
+            next_level_withoutprune = l_list_pre_combine(l_out)
+            print_list(next_level_withoutprune)
+            next_level = l_list_prune(next_level_withoutprune, l_out)
+            print_list(next_level)
         else:
-            l_out= l_list_pre_combine(c_pruned)
-            print_list(l_out)
+            next_level= l_list_pre_combine(l_out)
+            print_list(next_level)
 
-        return c_unpruned, c_pruned, l_out
+        return c_out, l_out, next_level
 
-    c0_next=next_level(0, c0)
-    c1_next=next_level(1, c0_next[2])
+    c1_status=next_level(0, c0_status)
+    c2_status=next_level(1, c1_status[2])
 
 
 if __name__ == "__main__":
