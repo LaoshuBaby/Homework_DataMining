@@ -1,9 +1,16 @@
+from Src.Apriori.user_class import Itemset
+
+
+
 def build_first_c_list(raw_data):
     c_list=set([])
     for i in range(len(raw_data)):
         for j in range(len(raw_data[i][1])):
             c_list.add(raw_data[i][1][j])
-    c_list=list(c_list)
+    c_list_pre=list(c_list)
+    c_list=[]
+    for i in range(len(c_list_pre)):
+        c_list.append(Itemset(data=[c_list_pre[i]],count=0,sup=0))
     return c_list
 
 
@@ -45,7 +52,9 @@ def l_list_prune(l_list,c_list):
     return true_l_list
 
 def apriori(RAW_DATA, MIN_SUP):
-    print(build_first_c_list(RAW_DATA))
+    c1=build_first_c_list(RAW_DATA)
+    for i in range(len(c1)):
+        print(c1[i])
 
 
 if __name__ == "__main__":

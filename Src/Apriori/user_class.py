@@ -9,4 +9,4 @@ class Itemset:
         self.count = count
 
     def __str__(self):
-        return str(self.data) + ' ' + str(self.sup) + ' ' + str(self.count)
+        return "data: "+str(self.data) + ' ' +"sup :"+ str(self.sup) + ' ' +"Count :"+ str(self.count)
