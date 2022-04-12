@@ -81,26 +81,24 @@ def apriori(RAW_DATA, MIN_SUP):
     # print_list(c0)
 
     # 循环内执行
-    def next_level(current_level, c_list, l_list=None):
-        c_out = c_list_prune(c_list_sup_count(RAW_DATA, c_list), MIN_SUP)
-        print_list(c_out)
+    def next_level(current_level, c_list):
+        c_unpruned=c_list_sup_count(RAW_DATA, c_list)
+        print_list(c_unpruned)
+        c_pruned = c_list_prune(c_unpruned, MIN_SUP)
+        print_list(c_pruned)
         if current_level != 0:
-            if l_list != None:
-                l1 = l_list_pre_combine(c_out)
-                print_list(l1)
-                l_out = l_list_prune(l1, c_out)
-                print_list(l_out)
-            else:
-                return None
+            l_out_withoutprune = l_list_pre_combine(c_pruned)
+            print_list(l_out_withoutprune)
+            l_out = l_list_prune(l_out_withoutprune, c_pruned)
+            print_list(l_out)
         else:
-            l_out= c_out
+            l_out= l_list_pre_combine(c_pruned)
             print_list(l_out)
 
-        return c_out, l_out
+        return c_unpruned, c_pruned, l_out
 
     c0_next=next_level(0, c0)
-    c1=c0_next[0]
-    l1=c0_next[1]
+    c1_next=next_level(1, c0_next[2])
 
 
 if __name__ == "__main__":
