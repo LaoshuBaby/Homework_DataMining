@@ -2,6 +2,8 @@ import time
 from Src.Apriori.main import apriori
 
 FILE_PATH="D:\\retail.dat"
+FILE_PATH_TEST="Src/Apriori/test.dat"
+FLAG_TEST=True
 TID=0
 RAW_DATA=[]
 
@@ -15,10 +17,15 @@ def genTID():
     return TID
 
 def read():
-    dat_file=open(FILE_PATH,"r")
+    if FLAG_TEST:
+        dat_file=open(FILE_PATH_TEST,"r")
+    else:
+        dat_file=open(FILE_PATH,"r")
     dat_text=dat_file.readlines()
     for i in range(len(dat_text)):
-        RAW_DATA.append([genTID(),dat_text[i].split(" ")[:-1]])
+        dat_list=dat_text[i].split(" ")
+        dat_list_clear=[x for x in dat_list if x!="\n"]
+        RAW_DATA.append([genTID(),dat_list_clear])
     return RAW_DATA
 
 if __name__ == "__main__":

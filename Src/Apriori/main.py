@@ -45,7 +45,7 @@ def l_list_prune(l_list,c_list):
     return true_l_list
 
 def apriori(RAW_DATA, MIN_SUP):
-    pass
+    print(build_first_c_list(RAW_DATA))
 
 
 if __name__ == "__main__":
