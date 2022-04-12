@@ -47,7 +47,7 @@ def l_list_pre_combine(c_list):
             if i != j:
                 l_list.append(
                     Itemset(
-                        data=set(c_list[i].data).union(set(c_list[j].data)),
+                        data=list(set(c_list[i].data).union(set(c_list[j].data))),
                         sup=0,
                         count=0,
                     )
@@ -57,16 +57,21 @@ def l_list_pre_combine(c_list):
 
 def l_list_prune(l_list, c_list):
     # 输入对应的clist，对llist的每一个项集都拆开看其子集是否全都在clist里，有不合法的就毙掉这个llist中的项集
+    print(len(l_list),len(c_list))
+    true_l_list=[]
     for i in range(len(l_list)):
         flag_not_exist = False
         for j in range(len(c_list)):
-            print("i=" + str(i) + " j=" + str(j))
+            print(
+                "l_list["+str(i)+"]="+str(set(l_list[i].data)),
+                "c_list["+str(j)+"]="+str(set(c_list[j].data)),
+                set(c_list[j].data).issubset(set(l_list[i].data))
+            )
             if set(c_list[j].data).issubset(set(l_list[i].data)) == False:
                 flag_not_exist = True
                 break
-        if flag_not_exist == True:
-            l_list.pop(i)
-    true_l_list = l_list
+        if flag_not_exist != True:
+            true_l_list.append(l_list[i])
     return true_l_list
 
 
@@ -77,17 +82,25 @@ def apriori(RAW_DATA, MIN_SUP):
 
     # 循环内执行
     def next_level(current_level, c_list, l_list=None):
-        if current_level != 0 and l_list == None:
-            return None
         c_out = c_list_prune(c_list_sup_count(RAW_DATA, c_list), MIN_SUP)
         print_list(c_out)
-        l1 = l_list_pre_combine(c_out)
-        print_list(l1)
-        l_out = l_list_prune(l1, c_out)
-        print_list(l_out)
+        if current_level != 0:
+            if l_list != None:
+                l1 = l_list_pre_combine(c_out)
+                print_list(l1)
+                l_out = l_list_prune(l1, c_out)
+                print_list(l_out)
+            else:
+                return None
+        else:
+            l_out= c_out
+            print_list(l_out)
+
         return c_out, l_out
 
-    next_level(0, c0)
+    c0_next=next_level(0, c0)
+    c1=c0_next[0]
+    l1=c0_next[1]
 
 
 if __name__ == "__main__":
