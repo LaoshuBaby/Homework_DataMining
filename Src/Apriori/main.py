@@ -1,9 +1,3 @@
-## COMPUTE
-
-def is_in():
-    # 例子：判断一个行[a,b,c,d,e]是否存在[a,m]，并返回false
-    pass
-
 def build_first_c_list(raw_data):
     c_list=set([])
     for i in range(len(raw_data)):
@@ -12,10 +6,8 @@ def build_first_c_list(raw_data):
     c_list=list(c_list)
     return c_list
 
-#### COUNT
 
 
-#### GenCi
 
 def count_sup_for_C_list(raw_data, c_list):
     for i in range(len(raw_data)):
@@ -41,11 +33,21 @@ def build_pre_l_list(c_list):
 
 def l_list_prune(l_list,c_list):
     # 输入对应的clist，对llist的每一个项集都拆开看其子集是否全都在clist里，有不合法的就毙掉这个llist中的项集
+    for i in range(len(l_list)):
+        flag_not_exist=False
+        for j in range(len(c_list)):
+            if set(c_list[j].data).issubset(set(l_list[i].data)) == False:
+                flag_not_exist = True
+                break
+        if flag_not_exist == True:
+            l_list.pop(i)
+    true_l_list=l_list
     return true_l_list
 
-def apriori():
+def apriori(RAW_DATA, MIN_SUP):
     pass
 
 
 if __name__ == "__main__":
-    apriori()
+    exit(-1)
+
