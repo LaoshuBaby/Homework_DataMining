@@ -54,8 +54,6 @@ def l_list_pre_combine(c_list):
                 ))
     return l_list
 
-#### PruneLi
-
 def l_list_prune(l_list,c_list):
     # 输入对应的clist，对llist的每一个项集都拆开看其子集是否全都在clist里，有不合法的就毙掉这个llist中的项集
     for i in range(len(l_list)):
@@ -76,12 +74,20 @@ def apriori(RAW_DATA, MIN_SUP):
     #print_list(c0)
 
     # 循环内执行
-    c1=c_list_prune(c_list_sup_count(RAW_DATA, c0), MIN_SUP)
-    print_list(c1)
-    l1=l_list_pre_combine(c1)
-    print_list(l1)
-    l1=l_list_prune(l1,c1)
-    print_list(l1)
+    def next_level(current_level, c_list, l_list=None):
+        if current_level!=0 and l_list==None:
+            return None
+        c_out = c_list_prune(c_list_sup_count(RAW_DATA, c_list), MIN_SUP)
+        print_list(c_out)
+        l1 = l_list_pre_combine(c_out)
+        print_list(l1)
+        l_out = l_list_prune(l1, c_out)
+        print_list(l_out)
+        return c_out,l_out
+
+    next_level(0,c0)
+
+
 
 if __name__ == "__main__":
     exit(-1)
