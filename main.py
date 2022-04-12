@@ -24,7 +24,12 @@ def read():
     dat_text=dat_file.readlines()
     for i in range(len(dat_text)):
         dat_list=dat_text[i].split(" ")
-        dat_list_clear=[x for x in dat_list if x!="\n"]
+        dat_list_clear=[]
+        for i in dat_list:
+            if "\n" in i:
+                i=i.replace("\n","")
+            if i != "":
+                dat_list_clear.append(i)
         RAW_DATA.append([genTID(),dat_list_clear])
     return RAW_DATA
 
