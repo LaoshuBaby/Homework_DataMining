@@ -15,10 +15,14 @@ def c_list_enum_collect(raw_data):
         single_line=list(raw_data[i][1])
         for j in range(len(single_line)):
             c_enum.add(single_line[j])
+        if i%10000 ==0:
+            print("[BEAT]Collect Enum"+str(i))
     c_enum = list(c_enum)
     c_list = []
     for i in range(len(c_enum)):
         c_list.append(Itemset(data=set(c_enum[i]), count=0, sup=0))
+        if i%10000 ==0:
+            print("[BEAT]Create Itemset"+str(i))
     return c_list
 
 
@@ -27,8 +31,12 @@ def c_list_sup_count(raw_data, c_list):
         for j in range(len(c_list)):
             if set(c_list[j].data).issubset(raw_data[i][1]):
                 c_list[j].count += 1
+        if i%100 ==0:
+            print("[BEAT]Calc Count"+str(i))
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
+        if i%100 ==0:
+            print("[BEAT]Calc Sup"+str(i))
     # 这个地方最好能对c_list进行排序，按照data里面各个元素的字典序
     # c_list=
     return c_list

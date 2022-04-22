@@ -6,19 +6,12 @@ from Src.Apriori.main import apriori
 FILE_PATH = "D:\\retail.dat"
 TEST_NAME="apriori_paper_attached"
 FILE_PATH_TEST = "Data/"+TEST_NAME+".dat"
-FLAG_TEST = True
-TID = 0
+FLAG_TEST = False
 RAW_DATA = []
 
-MIN_SUP = 0.5
+MIN_SUP = 0.001
 
 ## INPUT DATA
-
-
-def genTID():
-    global TID
-    TID += 1
-    return TID
 
 def read() -> list[list[Any, set[int]]]:
     if FLAG_TEST:
