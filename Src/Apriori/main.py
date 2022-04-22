@@ -4,7 +4,7 @@ from Src.Apriori.user_class import Itemset
 
 def print_list(lst):
     for i in range(len(lst)):
-        if len(lst)<=50:
+        if len(lst)<=1000:
             print(lst[i])
     print("======", "len=" + str(len(lst)))
 
@@ -18,27 +18,30 @@ def c_list_enum_collect(raw_data):
         if i%10000 ==0:
             print("[BEAT]Collect Enum"+str(i))
     c_enum = list(c_enum)
+    print(c_enum) #debug
     c_list = []
     for i in range(len(c_enum)):
-        c_list.append(Itemset(data=set(c_enum[i]), count=0, sup=0))
+        c_list.append(Itemset(data=set([c_enum[i]]), count=0, sup=0))
         if i%10000 ==0:
             print("[BEAT]Create Itemset"+str(i))
     return c_list
 
 
 def c_list_sup_count(raw_data, c_list):
+    # 在逐行的原始数据中统计若干个项集各种出现的总次数
     for i in range(len(raw_data)):
         for j in range(len(c_list)):
             if set(c_list[j].data).issubset(raw_data[i][1]):
                 c_list[j].count += 1
         if i%100 ==0:
-            print("[BEAT]Calc Count"+str(i))
+            print("[BEAT]Calc Count"+str(i)) #计数居然成了性能大头，真令人摸不着头脑
+    # 统计每个候选项集支持度
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
         if i%100 ==0:
             print("[BEAT]Calc Sup"+str(i))
-    # 这个地方最好能对c_list进行排序，按照data里面各个元素的字典序
-    # c_list=
+    
+    # 如果能顺便按照data里面各个元素的字典序对c_list进行排序是最好
     return c_list
 
 

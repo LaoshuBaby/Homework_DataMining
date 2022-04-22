@@ -19,14 +19,14 @@ def read() -> list[list[Any, set[int]]]:
     else:
         dat_file = open(FILE_PATH, "r")
     dat_text = dat_file.readlines()
-    data_list = [set([str(n) for n in l.split() if len(n) > 0]) for l in dat_text]
+    data_list = [set([n for n in l.split() if len(n) > 0]) for l in dat_text]
     RAW_DATA = [[i + 1, d] for i, d in enumerate(data_list)]
     return RAW_DATA
 
 
 if __name__ == "__main__":
     raw_data = read()
-    print(raw_data)
+    # print(raw_data)
     start_time = time.time()
     apriori(raw_data, MIN_SUP)
     end_time = time.time()
