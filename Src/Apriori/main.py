@@ -1,9 +1,11 @@
-from Src.Apriori.user_class import Itemset
+import time
 
+from Src.Apriori.user_class import Itemset
 
 def print_list(lst):
     for i in range(len(lst)):
-        print(lst[i])
+        if len(lst)<=50:
+            print(lst[i])
     print("======", "len=" + str(len(lst)))
 
 
@@ -122,24 +124,31 @@ def l_list_prune(l_list, c_list):
 
 
 def apriori(RAW_DATA, MIN_SUP):
+    start_time= time.time()
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
-    print_list(c0_status)
+    #print_list(c0_status)
+    print("Time used:",time.time()-start_time)
 
     # 循环内执行
     def gen_next_level(current_level:int, c_list):
         c_out=c_list_sup_count(RAW_DATA, c_list)
         print_list(c_out)
+        print("Time used:",time.time()-start_time)
         l_out = c_list_prune(c_out, MIN_SUP)
         print_list(l_out)
+        print("Time used:",time.time()-start_time)
         if current_level != 0:
             next_level_withoutprune = l_list_pre_combine(l_out)
             print_list(next_level_withoutprune)
+            print("Time used:",time.time()-start_time)
             next_level = l_list_prune(next_level_withoutprune, l_out)
             print_list(next_level)
+            print("Time used:",time.time()-start_time)
         else:
             next_level= l_list_pre_combine(l_out)
             print_list(next_level)
+            print("Time used:",time.time()-start_time)
 
         return c_out, l_out, next_level
 
@@ -149,6 +158,10 @@ def apriori(RAW_DATA, MIN_SUP):
     c2_status=gen_next_level(1, c1_status[2])
     print("THE THIRD RUN")
     c3_status=gen_next_level(2, c2_status[2])
+    print("THE FOURTH RUN")
+    c4_status=gen_next_level(3, c3_status[2])
+    print("THE FIFTH RUN")
+    c5_status=gen_next_level(4, c4_status[2])
 
 
 if __name__ == "__main__":

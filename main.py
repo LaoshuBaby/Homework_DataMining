@@ -1,9 +1,11 @@
 import time
+from typing import List, Set, Tuple, Any
 
 from Src.Apriori.main import apriori
 
 FILE_PATH = "D:\\retail.dat"
-FILE_PATH_TEST = "Src/Apriori/test.dat"
+TEST_NAME="apriori_paper_attached"
+FILE_PATH_TEST = "Data/"+TEST_NAME+".dat"
 FLAG_TEST = True
 TID = 0
 RAW_DATA = []
