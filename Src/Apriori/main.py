@@ -74,6 +74,27 @@ def l_list_prune(l_list, c_list):
                 "c_list["+str(j)+"]="+str(set(c_list[j].data)),
                 set(c_list[j].data).issubset(set(l_list[i].data))
             )
+            def gen_full_subset_list(set_x):
+                set_x_list=list(set_x)
+                # 使用二进制法生成所有子集
+                subset_list=[]
+                for i in range(len(set_x)):
+                    # 把i转成二进制,补齐长度到len(set_x)
+                    i_bin=str(bin(i)).replace("0b","")
+                    while len(i_bin)<len(set_x):
+                        i_bin="0"+i_bin
+                    #print(i_bin)
+                    # 提取1对应的set_x_list中的元素
+                    i_bin_list=[]
+                    for j in range(len(set_x)):
+                        if i_bin[j]=="1":
+                            i_bin_list.append(set_x_list[j])
+                    #print(i_bin_list)
+                    # 把提取出来的元素打包作为一个集合，添加到subset_list中
+                    if i_bin_list != []:
+                        subset_list.append(set(i_bin_list))
+                return subset_list
+            print(gen_full_subset_list(set(l_list[i].data)))
             if set(c_list[j].data).issubset(set(l_list[i].data)) == False:
                 flag_not_exist = True
                 break
