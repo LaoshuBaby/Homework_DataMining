@@ -23,8 +23,7 @@ def c_list_enum_collect(raw_data):
 def c_list_sup_count(raw_data, c_list):
     for i in range(len(raw_data)):
         for j in range(len(c_list)):
-            if set(c_list[j].data).issubset(set(raw_data[i][1])):
-                # if is_in(raw_data[i][1],c_list[j].data) :
+            if set(c_list[j].data).issubset(raw_data[i][1]):
                 c_list[j].count += 1
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
@@ -46,24 +45,20 @@ def l_list_pre_combine(c_list):
     for i in range(len(c_list)):
         for j in range(i, len(c_list)):
             if i != j:
-                ready_itemset=Itemset(
-                        data=list(set(c_list[i].data).union(set(c_list[j].data))),
+                itemset_ready=Itemset(
+                        data=set(c_list[i].data).union(set(c_list[j].data)),
                         sup=0,
                         count=0,
                     )
-                def ready_itemset_not_in_list(ready_itemset,l_list):
+                def itemset_not_in_list(itemset_x, l_list):
                     flag_not_in_list=True
                     for j in range(len(l_list)):
-                        if set(l_list[j].data)==(set(ready_itemset.data)):
-                            flag_not_in_list=False
-                        else:
-                            pass
+                        if l_list[j].data==itemset_x.data:
+                            return False
                     if flag_not_in_list==True:
                         return True
-                    else:
-                        return False
-                if ready_itemset_not_in_list(ready_itemset,l_list):
-                    l_list.append(ready_itemset)
+                if itemset_not_in_list(itemset_ready,l_list):
+                    l_list.append(itemset_ready)
     return l_list
 
 
@@ -90,7 +85,7 @@ def l_list_prune(l_list, c_list):
 def apriori(RAW_DATA, MIN_SUP):
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
-    # print_list(c0_status)
+    print_list(c0_status)
 
     # 循环内执行
     def gen_next_level(current_level:int, c_list):
