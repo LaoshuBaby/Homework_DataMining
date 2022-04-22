@@ -79,6 +79,8 @@ def l_list_prune(l_list, c_list):
                     i_bin=str(bin(i)).replace("0b","")
                     while len(i_bin)<len(set_x):
                         i_bin="0"+i_bin
+                    if i_bin.count("1")!=len(set_x)-1:
+                        continue
                     # print(i_bin)
                     # 提取1对应的set_x_list中的元素
                     i_bin_list=[]
@@ -91,24 +93,29 @@ def l_list_prune(l_list, c_list):
                         subset_list.append(set(i_bin_list))
                 return subset_list
             full_subset_list=gen_full_subset_list(set(l_list[i].data))
-            def set_not_in_list(list_x,set_x):
+            def set_not_in_list(set_x,list_x):
+                flag_found=False
                 for i in range(len(list_x)):
-                    if set(list_x[i])==set_x:
-                        return True
-                return False
+                    if set(list_x[i].data)==set_x:
+                        flag_found=True
+                    else:
+                        continue
+                if flag_found==False:
+                    return True
+                else:
+                    return False
 
-            flag_set_not_in_subsetlist = False
+            flag_have_invaild_subset = False
             for k in range(len(full_subset_list)):
-                if set_not_in_list(full_subset_list,c_list[j].data)==False:
-                    flag_set_not_in_subsetlist=True
-            if flag_set_not_in_subsetlist==False:
-                flag_not_exist = True
-            print(
-                "l_list["+str(i)+"]="+str(set(l_list[i].data)),
-                "c_list["+str(j)+"]="+str(set(c_list[j].data)),
-                flag_set_not_in_subsetlist
-            )
-        if flag_not_exist != True:
+                if set_not_in_list(full_subset_list[k],c_list)==True:
+                    flag_have_invaild_subset = True
+            # print(
+            #     "l_list["+str(i)+"]="+str(set(l_list[i].data)),
+            #     "c_list["+str(j)+"]="+str(set(c_list[j].data)),
+            #     flag_have_invaild_subset
+            # )
+            # print(full_subset_list)
+        if flag_have_invaild_subset == False:
             true_l_list.append(l_list[i])
 
     return true_l_list
@@ -140,6 +147,8 @@ def apriori(RAW_DATA, MIN_SUP):
     c1_status=gen_next_level(0, c0_status)
     print("THE SECOND RUN")
     c2_status=gen_next_level(1, c1_status[2])
+    print("THE THIRD RUN")
+    c3_status=gen_next_level(2, c2_status[2])
 
 
 if __name__ == "__main__":
