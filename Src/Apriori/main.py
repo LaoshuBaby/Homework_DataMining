@@ -132,6 +132,8 @@ def apriori(RAW_DATA, MIN_SUP):
 
     # 循环内执行
     def gen_next_level(current_level:int, c_list):
+        if len(c_list) ==0:
+            return None
         c_out=c_list_sup_count(RAW_DATA, c_list)
         print_list(c_out)
         print("Time used:",time.time()-start_time)
@@ -160,8 +162,6 @@ def apriori(RAW_DATA, MIN_SUP):
     c3_status=gen_next_level(2, c2_status[2])
     print("THE FOURTH RUN")
     c4_status=gen_next_level(3, c3_status[2])
-    print("THE FIFTH RUN")
-    c5_status=gen_next_level(4, c4_status[2])
 
 
 if __name__ == "__main__":

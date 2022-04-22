@@ -20,22 +20,14 @@ def genTID():
     TID += 1
     return TID
 
-
-def read():
+def read() -> list[list[Any, set[int]]]:
     if FLAG_TEST:
         dat_file = open(FILE_PATH_TEST, "r")
     else:
         dat_file = open(FILE_PATH, "r")
     dat_text = dat_file.readlines()
-    for i in range(len(dat_text)):
-        dat_list = dat_text[i].split(" ")
-        dat_list_clear = []
-        for i in dat_list:
-            if "\n" in i:
-                i = i.replace("\n", "")
-            if i != "":
-                dat_list_clear.append(i)
-        RAW_DATA.append([genTID(), set(dat_list_clear)])
+    data_list = [set([str(n) for n in l.split() if len(n) > 0]) for l in dat_text]
+    RAW_DATA = [[i + 1, d] for i, d in enumerate(data_list)]
     return RAW_DATA
 
 
