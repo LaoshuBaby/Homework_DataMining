@@ -45,13 +45,33 @@ def l_list_pre_combine(c_list):
     for i in range(len(c_list)):
         for j in range(i, len(c_list)):
             if i != j:
-                l_list.append(
-                    Itemset(
+                ready_itemset=Itemset(
                         data=list(set(c_list[i].data).union(set(c_list[j].data))),
                         sup=0,
                         count=0,
                     )
-                )
+                #debug
+                print("ready_itemset="+str(ready_itemset.data))
+                #debug
+                def ready_itemset_not_in_list(ready_itemset,l_list):
+                    flag_not_in_list=True
+                    for j in range(len(l_list)):
+                        if set(l_list[j].data)==(set(ready_itemset.data)):
+                            flag_not_in_list=False
+                        else:
+                            pass
+                    if flag_not_in_list==True:
+                        return True
+                    else:
+                        return False
+                # if ready_itemset not in l_list:
+                #     l_list.append(ready_itemset)
+                if ready_itemset_not_in_list(ready_itemset,l_list):
+                    l_list.append(ready_itemset)
+                #debug
+                for j in range(len(l_list)):
+                    print(l_list[j].data)
+                #debug
     return l_list
 
 
@@ -78,10 +98,10 @@ def l_list_prune(l_list, c_list):
 def apriori(RAW_DATA, MIN_SUP):
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
-    # print_list(c0)
+    # print_list(c0_status)
 
     # 循环内执行
-    def next_level(current_level, c_list):
+    def gen_next_level(current_level:int, c_list):
         c_out=c_list_sup_count(RAW_DATA, c_list)
         print_list(c_out)
         l_out = c_list_prune(c_out, MIN_SUP)
@@ -97,8 +117,10 @@ def apriori(RAW_DATA, MIN_SUP):
 
         return c_out, l_out, next_level
 
-    c1_status=next_level(0, c0_status)
-    c2_status=next_level(1, c1_status[2])
+    print("THE FIRST RUN")
+    c1_status=gen_next_level(0, c0_status)
+    print("THE SECOND RUN")
+    c2_status=gen_next_level(1, c1_status[2])
 
 
 if __name__ == "__main__":
