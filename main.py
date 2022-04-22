@@ -33,7 +33,7 @@ def read():
                 i = i.replace("\n", "")
             if i != "":
                 dat_list_clear.append(i)
-        RAW_DATA.append([genTID(), dat_list_clear])
+        RAW_DATA.append([genTID(), set(dat_list_clear)])
     return RAW_DATA
 
 

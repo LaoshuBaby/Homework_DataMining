@@ -8,14 +8,15 @@ def print_list(lst):
 
 
 def c_list_enum_collect(raw_data):
-    c_list = set([])
+    c_enum = set()
     for i in range(len(raw_data)):
-        for j in range(len(raw_data[i][1])):
-            c_list.add(raw_data[i][1][j])
-    c_list_pre = list(c_list)
+        single_line=list(raw_data[i][1])
+        for j in range(len(single_line)):
+            c_enum.add(single_line[j])
+    c_enum = list(c_enum)
     c_list = []
-    for i in range(len(c_list_pre)):
-        c_list.append(Itemset(data=[c_list_pre[i]], count=0, sup=0))
+    for i in range(len(c_enum)):
+        c_list.append(Itemset(data=set(c_enum[i]), count=0, sup=0))
     return c_list
 
 
@@ -50,9 +51,6 @@ def l_list_pre_combine(c_list):
                         sup=0,
                         count=0,
                     )
-                #debug
-                print("ready_itemset="+str(ready_itemset.data))
-                #debug
                 def ready_itemset_not_in_list(ready_itemset,l_list):
                     flag_not_in_list=True
                     for j in range(len(l_list)):
@@ -64,14 +62,8 @@ def l_list_pre_combine(c_list):
                         return True
                     else:
                         return False
-                # if ready_itemset not in l_list:
-                #     l_list.append(ready_itemset)
                 if ready_itemset_not_in_list(ready_itemset,l_list):
                     l_list.append(ready_itemset)
-                #debug
-                for j in range(len(l_list)):
-                    print(l_list[j].data)
-                #debug
     return l_list
 
 
