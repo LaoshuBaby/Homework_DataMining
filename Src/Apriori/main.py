@@ -69,37 +69,48 @@ def l_list_prune(l_list, c_list):
     for i in range(len(l_list)):
         flag_not_exist = False
         for j in range(len(c_list)):
-            print(
-                "l_list["+str(i)+"]="+str(set(l_list[i].data)),
-                "c_list["+str(j)+"]="+str(set(c_list[j].data)),
-                set(c_list[j].data).issubset(set(l_list[i].data))
-            )
+            # 判断应不应该修建
             def gen_full_subset_list(set_x):
                 set_x_list=list(set_x)
                 # 使用二进制法生成所有子集
                 subset_list=[]
-                for i in range(len(set_x)):
+                for i in range(pow(2,len(set_x))):
                     # 把i转成二进制,补齐长度到len(set_x)
                     i_bin=str(bin(i)).replace("0b","")
                     while len(i_bin)<len(set_x):
                         i_bin="0"+i_bin
-                    #print(i_bin)
+                    # print(i_bin)
                     # 提取1对应的set_x_list中的元素
                     i_bin_list=[]
                     for j in range(len(set_x)):
                         if i_bin[j]=="1":
                             i_bin_list.append(set_x_list[j])
-                    #print(i_bin_list)
+                    # print(i_bin_list)
                     # 把提取出来的元素打包作为一个集合，添加到subset_list中
                     if i_bin_list != []:
                         subset_list.append(set(i_bin_list))
                 return subset_list
-            print(gen_full_subset_list(set(l_list[i].data)))
-            if set(c_list[j].data).issubset(set(l_list[i].data)) == False:
+            full_subset_list=gen_full_subset_list(set(l_list[i].data))
+            def set_not_in_list(list_x,set_x):
+                for i in range(len(list_x)):
+                    if set(list_x[i])==set_x:
+                        return True
+                return False
+
+            flag_set_not_in_subsetlist = False
+            for k in range(len(full_subset_list)):
+                if set_not_in_list(full_subset_list,c_list[j].data)==False:
+                    flag_set_not_in_subsetlist=True
+            if flag_set_not_in_subsetlist==False:
                 flag_not_exist = True
-                break
+            print(
+                "l_list["+str(i)+"]="+str(set(l_list[i].data)),
+                "c_list["+str(j)+"]="+str(set(c_list[j].data)),
+                flag_set_not_in_subsetlist
+            )
         if flag_not_exist != True:
             true_l_list.append(l_list[i])
+
     return true_l_list
 
 
