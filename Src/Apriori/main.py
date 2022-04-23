@@ -2,12 +2,14 @@ import time
 
 from Src.Apriori.user_class import Itemset
 
+BEAT_FREQUENCY = 0#100
 
 def print_list(lst):
     for i in range(len(lst)):
-        if len(lst) <= 100:
+        if len(lst) <= BEAT_FREQUENCY:
             print(lst[i])
-    print("======", "len=" + str(len(lst)))
+    if BEAT_FREQUENCY != 0:
+        print("======", "len=" + str(len(lst)))
 
 
 def c_list_enum_collect(raw_data):
@@ -16,15 +18,17 @@ def c_list_enum_collect(raw_data):
         single_line = list(raw_data[i][1])
         for j in range(len(single_line)):
             c_enum.add(single_line[j])
-        if i % 10000 == 0:
-            print("[BEAT]Collect Enum" + str(i))
+        if BEAT_FREQUENCY !=0:
+            if i % (100*BEAT_FREQUENCY) == 0:
+                print("[BEAT]Calc Enum" + str(i))
     c_enum = list(c_enum)
     print(c_enum)  # debug
     c_list = []
     for i in range(len(c_enum)):
         c_list.append(Itemset(data=set([c_enum[i]]), count=0, sup=0))
-        if i % 10000 == 0:
-            print("[BEAT]Create Itemset" + str(i))
+        if BEAT_FREQUENCY != 0:
+            if i % (100 * BEAT_FREQUENCY) == 0:
+                print("[BEAT]Calc Enum" + str(i))
     return c_list
 
 
@@ -34,13 +38,16 @@ def c_list_sup_count(raw_data, c_list):
         for j in range(len(c_list)):
             if set(c_list[j].data).issubset(raw_data[i][1]):
                 c_list[j].count += 1
-        if i % 1000 == 0:
-            print("[BEAT]Calc Count" + str(i))  # 计数居然成了性能大头，真令人摸不着头脑
+        if BEAT_FREQUENCY != 0:
+            if i % (10 * BEAT_FREQUENCY) == 0:
+                print("[BEAT]Calc Support" + str(i)) # 性能优化重点关照
     # 统计每个候选项集支持度
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
-        if i % 1000 == 0:
-            print("[BEAT]Calc Sup" + str(i))
+        if BEAT_FREQUENCY != 0:
+            if i % (10 * BEAT_FREQUENCY) == 0:
+                print("[BEAT]Calc Support" + str(i))
+
 
     # 如果能顺便按照data里面各个元素的字典序对c_list进行排序是最好
     return c_list
@@ -127,12 +134,6 @@ def l_list_prune(l_list, c_list):
             for k in range(len(full_subset_list)):
                 if set_not_in_list(full_subset_list[k], c_list) == True:
                     flag_have_invaild_subset = True
-            # print(
-            #     "l_list["+str(i)+"]="+str(set(l_list[i].data)),
-            #     "c_list["+str(j)+"]="+str(set(c_list[j].data)),
-            #     flag_have_invaild_subset
-            # )
-            # print(full_subset_list)
         if flag_have_invaild_subset == False:
             true_l_list.append(l_list[i])
 
@@ -140,34 +141,52 @@ def l_list_prune(l_list, c_list):
 
 
 def apriori(RAW_DATA, MIN_SUP):
-    start_time = time.time()
+    start_time_first = time.time()
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
     # print_list(c0_status)
-    print("Time used:", time.time() - start_time)
+    end_time_first = time.time()
+    print("[0]Pre calc C1 time:", end_time_first - start_time_first)
 
     # 循环内执行
     def gen_next_level(current_level: int, c_list):
+        start_time_level = time.time()
         if len(c_list) == 0:
-            return None
+            return [], [], 0
+
+        start_time_c_list = time.time()
         c_out = c_list_sup_count(RAW_DATA, c_list)
         print_list(c_out)
-        print("Time used:", time.time() - start_time)
+        end_time_c_list = time.time()
+        print("[1]Gen C"+str(current_level+1)+" time:", end_time_c_list - start_time_c_list)
+
+        start_time_l_list = time.time()
         l_out = c_list_prune(c_out, MIN_SUP)
         print_list(l_out)
-        print("Time used:", time.time() - start_time)
+        end_time_l_list = time.time()
+        print("[2]Gen L"+str(current_level+1)+" time:", end_time_l_list - start_time_l_list)
         if current_level != 0:
+            # 预组合项集
+            start_time_pre_combine = time.time()
             next_level_withoutprune = l_list_pre_combine(l_out)
             print_list(next_level_withoutprune)
-            print("Time used:", time.time() - start_time)
+            end_time_pre_combine = time.time()
+            print("[3]Pre combine time:", end_time_pre_combine - start_time_pre_combine)
+            # 修剪存在非频繁子集的项集
+            start_time_prune = time.time()
             next_level = l_list_prune(next_level_withoutprune, l_out)
             print_list(next_level)
-            print("Time used:", time.time() - start_time)
+            end_time_prune = time.time()
+            print("[4]Prune time:", end_time_prune - start_time_prune)
         else:
+            # 预组合项集
+            start_time_pre_combine = time.time()
             next_level = l_list_pre_combine(l_out)
             print_list(next_level)
-            print("Time used:", time.time() - start_time)
+            end_time_pre_combine = time.time()
+            print("[3]Pre combine time:", end_time_pre_combine - start_time_pre_combine)
 
+        print("The "+str(current_level+1)+" round run total time:", time.time() - start_time_level)
         return c_out, l_out, next_level
 
     print("THE FIRST RUN")
@@ -180,6 +199,33 @@ def apriori(RAW_DATA, MIN_SUP):
     c4_status = gen_next_level(3, c3_status[2])
     print("THE FIFTH RUN")
     c4_status = gen_next_level(3, c3_status[2])
+
+    print("====[FINAL RESULT]====")
+    if len(c1_status[0]) !=0:
+        print("C1:")
+        print_list(c1_status[0])
+    if len(c1_status[1]) !=0:
+        print("L1:")
+        print_list(c1_status[1])
+    if len(c2_status[0]) !=0:
+        print("C2:")
+        print_list(c2_status[0])
+    if len(c2_status[1]) !=0:
+        print("L2:")
+        print_list(c2_status[1])
+    if len(c3_status[0]) !=0:
+        print("C3:")
+        print_list(c3_status[0])
+    if len(c3_status[1]) !=0:
+        print("L3:")
+        print_list(c3_status[1])
+    if len(c4_status[0]) !=0:
+        print("C4:")
+        print_list(c4_status[0])
+    if len(c4_status[1]) !=0:
+        print("L4:")
+        print_list(c4_status[1])
+    print("====[FINAL RESULT]====")
 
 
 if __name__ == "__main__":
