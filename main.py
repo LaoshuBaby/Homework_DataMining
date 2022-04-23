@@ -4,14 +4,15 @@ from typing import List, Set, Tuple, Any
 from Src.Apriori.main import apriori
 
 FILE_PATH = "D:\\retail.dat"
-TEST_NAME="apriori_paper_attached"
-FILE_PATH_TEST = "Data/"+TEST_NAME+".dat"
+TEST_NAME = "apriori_paper_attached"
+FILE_PATH_TEST = "Data/" + TEST_NAME + ".dat"
 FLAG_TEST = False
 RAW_DATA = []
 
 MIN_SUP = 0.001
 
 ## INPUT DATA
+
 
 def read() -> list[list[Any, set[int]]]:
     if FLAG_TEST:
@@ -27,7 +28,7 @@ def read() -> list[list[Any, set[int]]]:
 if __name__ == "__main__":
     raw_data = read()
     # print(raw_data)
-    start_time = time.time()
+    start_time_global = time.time()
     apriori(raw_data, MIN_SUP)
-    end_time = time.time()
-    print("Time taken:", end_time - start_time)
+    end_time_global = time.time()
+    print("总计用时", end_time - start_time)
