@@ -2,13 +2,14 @@ import time
 
 from Src.Apriori.user_class import Itemset
 
-BEAT_FREQUENCY = 0#100
+BEAT_FREQUENCY=""
 
-def print_list(lst):
+def print_list(lst, output="optional"):
+    # print("[BEAT]Print List")
     for i in range(len(lst)):
-        if len(lst) <= BEAT_FREQUENCY:
+        if len(lst) <= BEAT_FREQUENCY or output == "mandatory":
             print(lst[i])
-    if BEAT_FREQUENCY != 0:
+    if BEAT_FREQUENCY != 0 or output == "mandatory":
         print("======", "len=" + str(len(lst)))
 
 
@@ -18,8 +19,8 @@ def c_list_enum_collect(raw_data):
         single_line = list(raw_data[i][1])
         for j in range(len(single_line)):
             c_enum.add(single_line[j])
-        if BEAT_FREQUENCY !=0:
-            if i % (100*BEAT_FREQUENCY) == 0:
+        if BEAT_FREQUENCY != 0:
+            if i % (100 * BEAT_FREQUENCY) == 0:
                 print("[BEAT]Calc Enum" + str(i))
     c_enum = list(c_enum)
     print(c_enum)  # debug
@@ -40,14 +41,13 @@ def c_list_sup_count(raw_data, c_list):
                 c_list[j].count += 1
         if BEAT_FREQUENCY != 0:
             if i % (10 * BEAT_FREQUENCY) == 0:
-                print("[BEAT]Calc Support" + str(i)) # 性能优化重点关照
+                print("[BEAT]Calc Support" + str(i))  # 性能优化重点关照
     # 统计每个候选项集支持度
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
         if BEAT_FREQUENCY != 0:
             if i % (10 * BEAT_FREQUENCY) == 0:
                 print("[BEAT]Calc Support" + str(i))
-
 
     # 如果能顺便按照data里面各个元素的字典序对c_list进行排序是最好
     return c_list
@@ -140,7 +140,9 @@ def l_list_prune(l_list, c_list):
     return true_l_list
 
 
-def apriori(RAW_DATA, MIN_SUP):
+def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD):
+    global BEAT_FREQUENCY
+    BEAT_FREQUENCY=BEAT_FREQUENCY_THRESHOLD
     start_time_first = time.time()
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
@@ -158,20 +160,29 @@ def apriori(RAW_DATA, MIN_SUP):
         c_out = c_list_sup_count(RAW_DATA, c_list)
         print_list(c_out)
         end_time_c_list = time.time()
-        print("[1]Gen C"+str(current_level+1)+" time:", end_time_c_list - start_time_c_list)
+        print(
+            "[1]Gen C" + str(current_level + 1) + " time:",
+            end_time_c_list - start_time_c_list,
+        )
 
         start_time_l_list = time.time()
         l_out = c_list_prune(c_out, MIN_SUP)
         print_list(l_out)
         end_time_l_list = time.time()
-        print("[2]Gen L"+str(current_level+1)+" time:", end_time_l_list - start_time_l_list)
+        print(
+            "[2]Gen L" + str(current_level + 1) + " time:",
+            end_time_l_list - start_time_l_list,
+        )
         if current_level != 0:
             # 预组合项集
             start_time_pre_combine = time.time()
             next_level_withoutprune = l_list_pre_combine(l_out)
             print_list(next_level_withoutprune)
             end_time_pre_combine = time.time()
-            print("[3]Pre combine time:", end_time_pre_combine - start_time_pre_combine)
+            print(
+                "[3]Pre combine time:",
+                end_time_pre_combine - start_time_pre_combine,
+            )
             # 修剪存在非频繁子集的项集
             start_time_prune = time.time()
             next_level = l_list_prune(next_level_withoutprune, l_out)
@@ -184,9 +195,15 @@ def apriori(RAW_DATA, MIN_SUP):
             next_level = l_list_pre_combine(l_out)
             print_list(next_level)
             end_time_pre_combine = time.time()
-            print("[3]Pre combine time:", end_time_pre_combine - start_time_pre_combine)
+            print(
+                "[3]Pre combine time:",
+                end_time_pre_combine - start_time_pre_combine,
+            )
 
-        print("The "+str(current_level+1)+" round run total time:", time.time() - start_time_level)
+        print(
+            "The " + str(current_level + 1) + " round run total time:",
+            time.time() - start_time_level,
+        )
         return c_out, l_out, next_level
 
     print("THE FIRST RUN")
@@ -198,34 +215,26 @@ def apriori(RAW_DATA, MIN_SUP):
     print("THE FOURTH RUN")
     c4_status = gen_next_level(3, c3_status[2])
     print("THE FIFTH RUN")
-    c4_status = gen_next_level(3, c3_status[2])
+    c5_status = gen_next_level(3, c3_status[2])
 
-    print("====[FINAL RESULT]====")
-    if len(c1_status[0]) !=0:
-        print("C1:")
-        print_list(c1_status[0])
-    if len(c1_status[1]) !=0:
-        print("L1:")
-        print_list(c1_status[1])
-    if len(c2_status[0]) !=0:
-        print("C2:")
-        print_list(c2_status[0])
-    if len(c2_status[1]) !=0:
-        print("L2:")
-        print_list(c2_status[1])
-    if len(c3_status[0]) !=0:
-        print("C3:")
-        print_list(c3_status[0])
-    if len(c3_status[1]) !=0:
-        print("L3:")
-        print_list(c3_status[1])
-    if len(c4_status[0]) !=0:
-        print("C4:")
-        print_list(c4_status[0])
-    if len(c4_status[1]) !=0:
-        print("L4:")
-        print_list(c4_status[1])
-    print("====[FINAL RESULT]====")
+    print("$$$$$$[FINAL RESULT]$$$$$$")
+
+    def final(status, i):
+        if len(status[0]) != 0:
+            print("C" + str(i) + ":")
+            print_list(status[0], output="mandatory")
+        if len(status[1]) != 0:
+            print("L" + str(i) + ":")
+            print_list(status[1], output="mandatory")
+
+    for i in range(1, 5):
+        final(eval("c" + str(i) + "_status"), i)
+    print("$$$$$$[FINAL RESULT]$$$$$$")
+    sum_itemset=0
+    for i in range(1,5):
+        sum_itemset+=len(eval("c"+str(i)+"_status")[1])
+    print("Min support= "+str(MIN_SUP)+"\nThe sum of itemset: "+str(sum_itemset))
+    print("$$$$$$[FINAL RESULT]$$$$$$")
 
 
 if __name__ == "__main__":

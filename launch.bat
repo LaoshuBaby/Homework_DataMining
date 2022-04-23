@@ -1,0 +1,1 @@
+pypy main.py --min_sup=0.5 --beat_frequency=0 --flag_test=True > log.txt
