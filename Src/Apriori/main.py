@@ -44,16 +44,38 @@ def c_list_enum_collect(raw_data) -> List[Itemset]:
     return c_list
 
 
-def c_list_sup_count(raw_data, c_list) -> List[Itemset]:
+def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
     # 在逐行的原始数据中统计若干个项集各种出现的总次数
-    for i in range(len(raw_data)):
-        for j in range(len(c_list)):
-            if set(c_list[j].data).issubset(raw_data[i][1]):
-                c_list[j].count += 1
-        if BEAT_FREQUENCY != 0:
-            if i % (10 * BEAT_FREQUENCY) == 0:
-                if ONLY_FINAL == False:
-                    print("[BEAT]Calc Support" + str(i))  # 性能优化重点关照
+    # 若有缓存此处可以使用缓存，没有缓存再继续下面的过程
+    if NO_CACHE == False:
+        pass
+    else:
+        pass
+    if current_level == 1:
+        # 对C1的特别优化
+        dict_raw_data = {}
+        for i in range(len(raw_data)):
+            raw_data[i][1] = list(raw_data[i][1])
+            for j in range(len(raw_data[i][1])):
+                if dict_raw_data[raw_data[i][1][j]]:
+                    dict_raw_data[raw_data[i][1][j]] += 1
+                else:
+                    dict_raw_data[raw_data[i][1][j]] = 1
+            if BEAT_FREQUENCY != 0:
+                if i % (10 * BEAT_FREQUENCY) == 0:
+                    if ONLY_FINAL == False:
+                        print("[BEAT]Calc Count" + str(i))  # 性能优化重点关照
+        for i in range(len(c_list)):
+            c_list[i].data= {dict_raw_data[list(c_list[i].data)[0]]}
+    else:
+        for i in range(len(raw_data)):
+            for j in range(len(c_list)):
+                if set(c_list[j].data).issubset(raw_data[i][1]):
+                    c_list[j].count += 1
+            if BEAT_FREQUENCY != 0:
+                if i % (10 * BEAT_FREQUENCY) == 0:
+                    if ONLY_FINAL == False:
+                        print("[BEAT]Calc Count" + str(i))  # 性能优化重点关照
     # 统计每个候选项集支持度
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
@@ -178,7 +200,7 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE
             return [], [], []
 
         start_time_c_list = time.time()
-        c_out = c_list_sup_count(RAW_DATA, c_list)
+        c_out = c_list_sup_count(RAW_DATA, c_list, current_level+1)
         print_list(c_out)
         end_time_c_list = time.time()
         print(
