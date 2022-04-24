@@ -4,7 +4,15 @@ from distutils.util import strtobool
 from typing import Any
 
 from Src.Apriori.main import apriori
-from config import MIN_SUP, BEAT_FREQUENCY, FILE_PATH, FILE_PATH_TEST, FLAG_TEST, NO_CACHE, ONLY_FINAL
+from config import (
+    MIN_SUP,
+    BEAT_FREQUENCY,
+    FILE_PATH,
+    FILE_PATH_TEST,
+    FLAG_TEST,
+    NO_CACHE,
+    ONLY_FINAL,
+)
 
 
 def read(flag_test) -> list[list[Any, set[int]]]:
@@ -41,6 +49,6 @@ if __name__ == "__main__":
     raw_data = read(FLAG_TEST)
     # print(raw_data)
     start_time_global = time.time()
-    apriori(raw_data, MIN_SUP, BEAT_FREQUENCY,ONLY_FINAL,NO_CACHE)
+    apriori(raw_data, MIN_SUP, BEAT_FREQUENCY, ONLY_FINAL, NO_CACHE)
     end_time_global = time.time()
     print("Total time:", end_time_global - start_time_global)

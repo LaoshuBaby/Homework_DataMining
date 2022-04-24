@@ -7,9 +7,11 @@ BEAT_FREQUENCY = 100
 ONLY_FINAL = False
 NO_CACHE = True
 
+
 def print_log(print_func) -> None:
     if ONLY_FINAL == False:
         print_func()
+
 
 def print_list(lst, output="optional") -> None:
     # print("[BEAT]Print List")
@@ -30,7 +32,7 @@ def c_list_enum_collect(raw_data) -> List[Itemset]:
             c_enum.add(single_line[j])
         if BEAT_FREQUENCY != 0:
             if i % (100 * BEAT_FREQUENCY) == 0:
-                if ONLY_FINAL ==False:
+                if ONLY_FINAL == False:
                     print("[BEAT]Calc Enum" + str(i))
     c_enum = list(c_enum)
     # print(c_enum)
@@ -47,7 +49,7 @@ def c_list_enum_collect(raw_data) -> List[Itemset]:
 def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
     # 在逐行的原始数据中统计若干个项集各种出现的总次数
     # 若有缓存此处可以使用缓存，没有缓存再继续下面的过程
-    FLAG_PYPY= False
+    FLAG_PYPY = False
     if FLAG_PYPY == False:
         if NO_CACHE == False:
             pass
@@ -67,18 +69,17 @@ def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
                 if i % (10 * BEAT_FREQUENCY) == 0:
                     if ONLY_FINAL == False:
                         print("[BEAT]Calc Count" + str(i))
-        c_list=[]
+        c_list = []
         for k in dict_raw_data:
-            c_list.append(Itemset(
-                data={k},
-                sup=0,
-                count=dict_raw_data[k]
-            ))
+            c_list.append(Itemset(data={k}, sup=0, count=dict_raw_data[k]))
     elif current_level == 2:
         for i in range(len(raw_data)):
             for j in range(len(c_list)):
-                line_list=list(c_list[j].data)
-                if line_list[0] in raw_data[i][1] and line_list[1] in raw_data[i][1]: # The only line that differ from normal version
+                line_list = list(c_list[j].data)
+                if (
+                    line_list[0] in raw_data[i][1]
+                    and line_list[1] in raw_data[i][1]
+                ):  # The only line that differ from normal version
                     c_list[j].count += 1
             if BEAT_FREQUENCY != 0:
                 if i % (10 * BEAT_FREQUENCY) == 0:
@@ -144,7 +145,7 @@ def l_list_prune(l_list, c_list) -> List[Itemset]:
     true_l_list = []
     for i in range(len(l_list)):
         flag_not_exist = False
-        for j in range(len(c_list)): #用候选项集里面的每一个都看是否应该用来毙掉llist的
+        for j in range(len(c_list)):  # 用候选项集里面的每一个都看是否应该用来毙掉llist的
             # 判断应不应该修建
             def gen_full_subset_list(set_x) -> List[set]:
                 set_x_list = list(set_x)
@@ -193,13 +194,15 @@ def l_list_prune(l_list, c_list) -> List[Itemset]:
     return true_l_list
 
 
-def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE_FLAG):
+def apriori(
+    RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD, ONLY_FINAL_FLAG, NO_CACHE_FLAG
+):
     global BEAT_FREQUENCY
-    BEAT_FREQUENCY=BEAT_FREQUENCY_THRESHOLD
+    BEAT_FREQUENCY = BEAT_FREQUENCY_THRESHOLD
     global ONLY_FINAL
-    ONLY_FINAL=ONLY_FINAL_FLAG
+    ONLY_FINAL = ONLY_FINAL_FLAG
     global NO_CACHE
-    NO_CACHE=NO_CACHE_FLAG
+    NO_CACHE = NO_CACHE_FLAG
 
     print("THE PRE RUN")
     start_time_first = time.time()
@@ -213,11 +216,11 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE
     def gen_next_level(current_level: int, c_list):
         start_time_level = time.time()
         if len(c_list) == 0:
-            print("The "+str(current_level+1)+" level is skipped")
+            print("The " + str(current_level + 1) + " level is skipped")
             return [], [], []
 
         start_time_c_list = time.time()
-        c_out = c_list_sup_count(RAW_DATA, c_list, current_level+1)
+        c_out = c_list_sup_count(RAW_DATA, c_list, current_level + 1)
         print_list(c_out)
         end_time_c_list = time.time()
         print(
@@ -279,6 +282,7 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE
 
     print("$$$$$$[FINAL RESULT]$$$$$$")
     if ONLY_FINAL == False:
+
         def final(status, i):
             if len(status[0]) != 0:
                 print("C" + str(i) + ":")
@@ -290,10 +294,15 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE
         for i in range(1, 5):
             final(eval("c" + str(i) + "_status"), i)
     print("$$$$$$[FINAL RESULT]$$$$$$")
-    sum_itemset=0
-    for i in range(1,5):
-        sum_itemset+=len(eval("c"+str(i)+"_status")[1])
-    print("Min support= "+str(MIN_SUP)+"\nThe sum of itemset: "+str(sum_itemset))
+    sum_itemset = 0
+    for i in range(1, 5):
+        sum_itemset += len(eval("c" + str(i) + "_status")[1])
+    print(
+        "Min support= "
+        + str(MIN_SUP)
+        + "\nThe sum of itemset: "
+        + str(sum_itemset)
+    )
     print("$$$$$$[FINAL RESULT]$$$$$$")
 
 
