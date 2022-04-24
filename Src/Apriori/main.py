@@ -66,8 +66,7 @@ def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
             if BEAT_FREQUENCY != 0:
                 if i % (10 * BEAT_FREQUENCY) == 0:
                     if ONLY_FINAL == False:
-                        print("[BEAT]Calc Count" + str(i))  # 性能优化重点关照
-        # print(dict_raw_data)
+                        print("[BEAT]Calc Count" + str(i))
         c_list=[]
         for k in dict_raw_data:
             c_list.append(Itemset(
@@ -75,6 +74,16 @@ def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
                 sup=0,
                 count=dict_raw_data[k]
             ))
+    elif current_level == 2:
+        for i in range(len(raw_data)):
+            for j in range(len(c_list)):
+                line_list=list(c_list[j].data)
+                if line_list[0] in raw_data[i][1] and line_list[1] in raw_data[i][1]: # The only line that differ from normal version
+                    c_list[j].count += 1
+            if BEAT_FREQUENCY != 0:
+                if i % (10 * BEAT_FREQUENCY) == 0:
+                    if ONLY_FINAL == False:
+                        print("[BEAT]Calc Count" + str(i))  # 性能优化重点关照
     else:
         for i in range(len(raw_data)):
             for j in range(len(c_list)):
@@ -135,7 +144,7 @@ def l_list_prune(l_list, c_list) -> List[Itemset]:
     true_l_list = []
     for i in range(len(l_list)):
         flag_not_exist = False
-        for j in range(len(c_list)):
+        for j in range(len(c_list)): #用候选项集里面的每一个都看是否应该用来毙掉llist的
             # 判断应不应该修建
             def gen_full_subset_list(set_x) -> List[set]:
                 set_x_list = list(set_x)
