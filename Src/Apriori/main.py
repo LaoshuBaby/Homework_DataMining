@@ -2,15 +2,19 @@ import time
 
 from Src.Apriori.user_class import Itemset
 
-BEAT_FREQUENCY=""
+BEAT_FREQUENCY = 100
+ONLY_FINAL = False
+NO_CACHE = True
 
 def print_list(lst, output="optional"):
     # print("[BEAT]Print List")
     for i in range(len(lst)):
         if len(lst) <= BEAT_FREQUENCY or output == "mandatory":
-            print(lst[i])
+            if ONLY_FINAL == False:
+                print(lst[i])
     if BEAT_FREQUENCY != 0 or output == "mandatory":
-        print("======", "len=" + str(len(lst)))
+        if ONLY_FINAL == False:
+            print("======", "len=" + str(len(lst)))
 
 
 def c_list_enum_collect(raw_data):
@@ -21,15 +25,17 @@ def c_list_enum_collect(raw_data):
             c_enum.add(single_line[j])
         if BEAT_FREQUENCY != 0:
             if i % (100 * BEAT_FREQUENCY) == 0:
-                print("[BEAT]Calc Enum" + str(i))
+                if ONLY_FINAL ==False:
+                    print("[BEAT]Calc Enum" + str(i))
     c_enum = list(c_enum)
-    print(c_enum)  # debug
+    # print(c_enum)
     c_list = []
     for i in range(len(c_enum)):
-        c_list.append(Itemset(data=set([c_enum[i]]), count=0, sup=0))
+        c_list.append(Itemset(data={c_enum[i]}, count=0, sup=0))
         if BEAT_FREQUENCY != 0:
             if i % (100 * BEAT_FREQUENCY) == 0:
-                print("[BEAT]Calc Enum" + str(i))
+                if ONLY_FINAL == False:
+                    print("[BEAT]Calc Enum" + str(i))
     return c_list
 
 
@@ -41,13 +47,15 @@ def c_list_sup_count(raw_data, c_list):
                 c_list[j].count += 1
         if BEAT_FREQUENCY != 0:
             if i % (10 * BEAT_FREQUENCY) == 0:
-                print("[BEAT]Calc Support" + str(i))  # 性能优化重点关照
+                if ONLY_FINAL == False:
+                    print("[BEAT]Calc Support" + str(i))  # 性能优化重点关照
     # 统计每个候选项集支持度
     for i in range(len(c_list)):
         c_list[i].sup = c_list[i].count / len(raw_data)
         if BEAT_FREQUENCY != 0:
             if i % (10 * BEAT_FREQUENCY) == 0:
-                print("[BEAT]Calc Support" + str(i))
+                if ONLY_FINAL == False:
+                    print("[BEAT]Calc Support" + str(i))
 
     # 如果能顺便按照data里面各个元素的字典序对c_list进行排序是最好
     return c_list
@@ -77,7 +85,7 @@ def l_list_pre_combine(c_list):
                     for j in range(len(l_list)):
                         if l_list[j].data == itemset_x.data:
                             return False
-                    if flag_not_in_list == True:
+                    if flag_not_in_list:
                         return True
 
                 if itemset_not_in_list(itemset_ready, l_list):
@@ -87,7 +95,8 @@ def l_list_pre_combine(c_list):
 
 def l_list_prune(l_list, c_list):
     # 输入对应的clist，对llist的每一个项集都拆开看其子集是否全都在clist里，有不合法的就毙掉这个llist中的项集
-    print(len(l_list), len(c_list))
+    if ONLY_FINAL == False:
+        print(len(l_list), len(c_list))
     true_l_list = []
     for i in range(len(l_list)):
         flag_not_exist = False
@@ -140,9 +149,15 @@ def l_list_prune(l_list, c_list):
     return true_l_list
 
 
-def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD):
+def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE_FLAG):
     global BEAT_FREQUENCY
     BEAT_FREQUENCY=BEAT_FREQUENCY_THRESHOLD
+    global ONLY_FINAL
+    ONLY_FINAL=ONLY_FINAL_FLAG
+    global NO_CACHE
+    NO_CACHE=NO_CACHE_FLAG
+
+    print("THE FIRST RUN")
     start_time_first = time.time()
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
@@ -154,7 +169,7 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD):
     def gen_next_level(current_level: int, c_list):
         start_time_level = time.time()
         if len(c_list) == 0:
-            return [], [], 0
+            return [], [], []
 
         start_time_c_list = time.time()
         c_out = c_list_sup_count(RAW_DATA, c_list)
@@ -215,20 +230,20 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD):
     print("THE FOURTH RUN")
     c4_status = gen_next_level(3, c3_status[2])
     print("THE FIFTH RUN")
-    c5_status = gen_next_level(3, c3_status[2])
+    c5_status = gen_next_level(4, c4_status[2])
 
     print("$$$$$$[FINAL RESULT]$$$$$$")
+    if ONLY_FINAL == False:
+        def final(status, i):
+            if len(status[0]) != 0:
+                print("C" + str(i) + ":")
+                print_list(status[0], output="mandatory")
+            if len(status[1]) != 0:
+                print("L" + str(i) + ":")
+                print_list(status[1], output="mandatory")
 
-    def final(status, i):
-        if len(status[0]) != 0:
-            print("C" + str(i) + ":")
-            print_list(status[0], output="mandatory")
-        if len(status[1]) != 0:
-            print("L" + str(i) + ":")
-            print_list(status[1], output="mandatory")
-
-    for i in range(1, 5):
-        final(eval("c" + str(i) + "_status"), i)
+        for i in range(1, 5):
+            final(eval("c" + str(i) + "_status"), i)
     print("$$$$$$[FINAL RESULT]$$$$$$")
     sum_itemset=0
     for i in range(1,5):
