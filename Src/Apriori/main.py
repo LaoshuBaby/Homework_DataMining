@@ -47,17 +47,19 @@ def c_list_enum_collect(raw_data) -> List[Itemset]:
 def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
     # 在逐行的原始数据中统计若干个项集各种出现的总次数
     # 若有缓存此处可以使用缓存，没有缓存再继续下面的过程
-    if NO_CACHE == False:
-        pass
-    else:
-        pass
+    FLAG_PYPY= False
+    if FLAG_PYPY == False:
+        if NO_CACHE == False:
+            pass
+        else:
+            pass
     if current_level == 1:
         # 对C1的特别优化
         dict_raw_data = {}
         for i in range(len(raw_data)):
             raw_data[i][1] = list(raw_data[i][1])
             for j in range(len(raw_data[i][1])):
-                if dict_raw_data[raw_data[i][1][j]]:
+                if raw_data[i][1][j] in dict_raw_data:
                     dict_raw_data[raw_data[i][1][j]] += 1
                 else:
                     dict_raw_data[raw_data[i][1][j]] = 1
@@ -65,8 +67,14 @@ def c_list_sup_count(raw_data, c_list, current_level=-1) -> List[Itemset]:
                 if i % (10 * BEAT_FREQUENCY) == 0:
                     if ONLY_FINAL == False:
                         print("[BEAT]Calc Count" + str(i))  # 性能优化重点关照
-        for i in range(len(c_list)):
-            c_list[i].data= {dict_raw_data[list(c_list[i].data)[0]]}
+        # print(dict_raw_data)
+        c_list=[]
+        for k in dict_raw_data:
+            c_list.append(Itemset(
+                data={k},
+                sup=0,
+                count=dict_raw_data[k]
+            ))
     else:
         for i in range(len(raw_data)):
             for j in range(len(c_list)):
