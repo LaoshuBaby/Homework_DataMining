@@ -1,4 +1,5 @@
 import time
+from typing import List
 
 from Src.Apriori.user_class import Itemset
 
@@ -6,7 +7,11 @@ BEAT_FREQUENCY = 100
 ONLY_FINAL = False
 NO_CACHE = True
 
-def print_list(lst, output="optional"):
+def print_log(print_func) -> None:
+    if ONLY_FINAL == False:
+        print_func()
+
+def print_list(lst, output="optional") -> None:
     # print("[BEAT]Print List")
     for i in range(len(lst)):
         if len(lst) <= BEAT_FREQUENCY or output == "mandatory":
@@ -17,7 +22,7 @@ def print_list(lst, output="optional"):
             print("======", "len=" + str(len(lst)))
 
 
-def c_list_enum_collect(raw_data):
+def c_list_enum_collect(raw_data) -> List[Itemset]:
     c_enum = set()
     for i in range(len(raw_data)):
         single_line = list(raw_data[i][1])
@@ -39,7 +44,7 @@ def c_list_enum_collect(raw_data):
     return c_list
 
 
-def c_list_sup_count(raw_data, c_list):
+def c_list_sup_count(raw_data, c_list) -> List[Itemset]:
     # 在逐行的原始数据中统计若干个项集各种出现的总次数
     for i in range(len(raw_data)):
         for j in range(len(c_list)):
@@ -61,7 +66,7 @@ def c_list_sup_count(raw_data, c_list):
     return c_list
 
 
-def c_list_prune(c_list, MIN_SUP):
+def c_list_prune(c_list, MIN_SUP) -> List[Itemset]:
     new_c_list = []
     for i in range(len(c_list)):
         if c_list[i].sup >= MIN_SUP:
@@ -69,7 +74,7 @@ def c_list_prune(c_list, MIN_SUP):
     return new_c_list
 
 
-def l_list_pre_combine(c_list):
+def l_list_pre_combine(c_list) -> List[Itemset]:
     l_list = []
     for i in range(len(c_list)):
         for j in range(i, len(c_list)):
@@ -93,7 +98,7 @@ def l_list_pre_combine(c_list):
     return l_list
 
 
-def l_list_prune(l_list, c_list):
+def l_list_prune(l_list, c_list) -> List[Itemset]:
     # 输入对应的clist，对llist的每一个项集都拆开看其子集是否全都在clist里，有不合法的就毙掉这个llist中的项集
     if ONLY_FINAL == False:
         print(len(l_list), len(c_list))
@@ -102,7 +107,7 @@ def l_list_prune(l_list, c_list):
         flag_not_exist = False
         for j in range(len(c_list)):
             # 判断应不应该修建
-            def gen_full_subset_list(set_x):
+            def gen_full_subset_list(set_x) -> List[set]:
                 set_x_list = list(set_x)
                 # 使用二进制法生成所有子集
                 subset_list = []
@@ -127,7 +132,7 @@ def l_list_prune(l_list, c_list):
 
             full_subset_list = gen_full_subset_list(set(l_list[i].data))
 
-            def set_not_in_list(set_x, list_x):
+            def set_not_in_list(set_x, list_x) -> bool:
                 flag_found = False
                 for i in range(len(list_x)):
                     if set(list_x[i].data) == set_x:
@@ -157,7 +162,7 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE
     global NO_CACHE
     NO_CACHE=NO_CACHE_FLAG
 
-    print("THE FIRST RUN")
+    print("THE PRE RUN")
     start_time_first = time.time()
     # 预热遍历生成空的所有待计算支持度的元素列表
     c0_status = c_list_enum_collect(RAW_DATA)
@@ -169,6 +174,7 @@ def apriori(RAW_DATA, MIN_SUP, BEAT_FREQUENCY_THRESHOLD,ONLY_FINAL_FLAG,NO_CACHE
     def gen_next_level(current_level: int, c_list):
         start_time_level = time.time()
         if len(c_list) == 0:
+            print("The "+str(current_level+1)+" level is skipped")
             return [], [], []
 
         start_time_c_list = time.time()
